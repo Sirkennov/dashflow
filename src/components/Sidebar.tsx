@@ -41,18 +41,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavLinkClick, activePath }) 
                     <li className="mb-2">
                         <a
                             href="#"
-                            onClick={() => onNavLinkClick('/clientes')}
-                            className={getLinkClasses('/clientes')}
+                            onClick={() => onNavLinkClick('/users')}
+                            className={getLinkClasses('/users')}
                         >
                             <FaUsers className="mr-3 text-xl" />
-                            Clientes
+                            Usuarios
                         </a>
                     </li>
                     <li className="mb-2">
                         <a
                             href="#"
-                            onClick={() => onNavLinkClick('/productos')}
-                            className={getLinkClasses('/productos')}
+                            onClick={() => onNavLinkClick('/products')}
+                            className={getLinkClasses('/products')}
                         >
                             <FaBox className="mr-3 text-xl" />
                             Productos

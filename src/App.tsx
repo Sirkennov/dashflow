@@ -33,7 +33,7 @@ function App() {
                 {/* Ruta raíz redirige a /login */}
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 {/* Rutas protegidas (solo para usuarios autenticados) */}
-                <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+                <Route path="/*" element={<ProtectedRoute><HomePage /></ProtectedRoute>} /> 
             </Routes>
         </Router>
     );

@@ -74,7 +74,7 @@ export const SignInPage: React.FC = () => {
 
                     <Button
                         type="submit"
-                        className="w-full mb-4 mt-2"
+                        className="bg-red-500 hover:bg-red-700 w-full mb-4 mt-2"
                     >
                         Registrarse
                     </Button>

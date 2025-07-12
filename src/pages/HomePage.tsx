@@ -1,10 +1,9 @@
-// src/pages/HomePage.tsx
 import { useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
 import { MainContent } from '../components/MainContent';
 import { DashboardPage } from './DashboardPage';
-import { ClientsPage } from './ClientsPage';
+import { UsersPage } from './UsersPage';
 import { ProductsPage } from './ProductsPage';
 
 export const HomePage: React.FC = () => {
@@ -19,9 +18,9 @@ export const HomePage: React.FC = () => {
         switch (activeContent) {
             case 'dashboard':
                 return <DashboardPage />;
-            case 'clientes':
-                return <ClientsPage />;
-            case 'productos':
+            case 'users':
+                return <UsersPage />;
+            case 'products':
                 return <ProductsPage />;
             default:
                 return <DashboardPage />;
