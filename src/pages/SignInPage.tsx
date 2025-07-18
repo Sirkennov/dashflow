@@ -2,28 +2,75 @@ import React, { useState } from 'react';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { useNavigate } from 'react-router-dom';
-import { useRegister } from '../hooks/useRegister';
+import { useRegister } from '../hooks/useRegister'; // Asegúrate de que este hook ya retorna 'loading'
 
 export const SignInPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [displayName, setDisplayName] = useState('');
     const navigate = useNavigate();
 
-    const { register, error, setError } = useRegister();
+    // Estados para errores de validación de campos
+    const [nameError, setNameError] = useState<string | null>(null);
+    const [emailError, setEmailError] = useState<string | null>(null);
+    const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
+
+    const { register, error, setError, loading } = useRegister();
+
+    const validateForm = () => {
+        let isValid = true;
+
+        // Validar Nombre de Usuario
+        if (displayName.trim() === '') {
+            setNameError('El nombre de usuario no puede estar vacío.');
+            isValid = false;
+        } else {
+            setNameError(null);
+        }
+
+        // Validar Email
+        if (email.trim() === '') {
+            setEmailError('El email no puede estar vacío.');
+            isValid = false;
+        } else {
+            setEmailError(null);
+        }
+
+        // Validar Contraseña
+        if (password.trim() === '') {
+            setPasswordError('La contraseña no puede estar vacía.');
+            isValid = false;
+        } else {
+            setPasswordError(null);
+        }
+
+        // Validar Confirmar Contraseña
+        if (confirmPassword.trim() === '') {
+            setConfirmPasswordError('La confirmación de contraseña no puede estar vacía.');
+            isValid = false;
+        } else if (confirmPassword !== password) {
+            setConfirmPasswordError('Las contraseñas no coinciden.');
+            isValid = false;
+        } else {
+            setConfirmPasswordError(null);
+        }
+
+        return isValid;
+    };
 
     const handleSignUpSubmit = async (event: React.FormEvent) => {
-        event.preventDefault(); // Previene el comportamiento por defecto de recarga del formulario
+        event.preventDefault();
 
-        setError(null);
-
-        if (password !== confirmPassword) {
-            setError('Las contraseñas no coinciden.');
+        // Ejecutar la validación antes de intentar guardar
+        if (!validateForm()) {
             return;
         }
 
-        // Llama a la función 'register' del hook, pasando el email, la contraseña y el callback de éxito
-        await register(email, password, () => {
+        setError(null);
+        // Llama a la función 'register' del hook
+        await register(email, password, displayName, () => {
             navigate('/home'); // Callback que se ejecuta SÓLO si el registro en Firebase es exitoso
         });
     };
@@ -46,14 +93,23 @@ export const SignInPage: React.FC = () => {
 
                 <form onSubmit={handleSignUpSubmit}>
                     <Input
-                        type="email"
+                        type="text"
+                        placeholder="Nombre"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        id="displayName"
+                        name="displayName"
+                    />
+                    {nameError && <p className="text-sm text-red-500 -mt-3 mb-1">{nameError}</p>}
+                    <Input
+                        type="text"
                         placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         id="email"
                         name="email"
                     />
-
+                    {emailError && <p className="text-sm text-red-500 -mt-3 mb-1">{emailError}</p>}
                     <Input
                         type="password"
                         placeholder="Contraseña"
@@ -62,7 +118,7 @@ export const SignInPage: React.FC = () => {
                         id="password"
                         name="password"
                     />
-
+                    {passwordError && <p className="text-sm text-red-500 -mt-3 mb-1">{passwordError}</p>}
                     <Input
                         type="password"
                         placeholder="Confirmar Contraseña"
@@ -71,12 +127,13 @@ export const SignInPage: React.FC = () => {
                         id="confirmPassword"
                         name="confirmPassword"
                     />
-
+                    {confirmPasswordError && <p className="text-sm text-red-500 -mt-3">{confirmPasswordError}</p>}
                     <Button
                         type="submit"
                         className="bg-red-500 hover:bg-red-700 w-full mb-4 mt-2"
+                        disabled={loading}
                     >
-                        Registrarse
+                        {loading ? 'Registrando...' : 'Registrarse'}
                     </Button>
                 </form>
 

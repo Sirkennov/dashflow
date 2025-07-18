@@ -9,11 +9,42 @@ export const LoginPage: React.FC = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
+    // Estados para errores de validación de campos
+    const [emailError, setEmailError] = useState<string | null>(null);
+    const [passwordError, setPasswordError] = useState<string | null>(null);
+
     // Usa el hook useLogin
     const { login, error } = useLogin();
 
+    const validateForm = () => {
+        let isValid = true;
+        // Validar Email
+        if (email.trim() === '') {
+            setEmailError('El email no puede estar vacío.');
+            isValid = false;
+        } else {
+            setEmailError(null);
+        }
+
+        // Validar Contraseña
+        if (password.trim() === '') {
+            setPasswordError('La contraseña no puede estar vacía.');
+            isValid = false;
+        } else {
+            setPasswordError(null);
+        }
+
+        return isValid;
+    };
+
+
     const handleLoginSubmit = async (event: React.FormEvent) => {
         event.preventDefault(); // Previene la recarga de la página
+
+        // Validar el formulario
+        if (!validateForm()) {
+            return;
+        }
 
         // Llama a la función 'login' del hook y le pasa el callback de redirección
         await login(email, password, () => {
@@ -39,14 +70,14 @@ export const LoginPage: React.FC = () => {
 
                 <form onSubmit={handleLoginSubmit}>
                     <Input
-                        type="email"
+                        type="text"
                         placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         id="email"
                         name="email"
                     />
-
+                    {emailError && <p className="text-sm text-red-500 -mt-3 mb-1">{emailError}</p>}
                     <Input
                         type="password"
                         placeholder="Contraseña"
@@ -55,7 +86,7 @@ export const LoginPage: React.FC = () => {
                         id="password"
                         name="password"
                     />
-
+                    {passwordError && <p className="text-sm text-red-500 -mt-3 mb-1">{passwordError}</p>}
                     <Button
                         type="submit"
                         className="bg-red-500 hover:bg-red-700 w-full mb-4 mt-2"
