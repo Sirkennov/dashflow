@@ -63,7 +63,7 @@ export const MainHeader: React.FC = () => {
                     />
                 </button>
                 <div>
-                    <p className="font-semibold text-gray-800">{user?.displayName}</p>
+                    <p className="font-semibold overflow-hidden text-ellipsis whitespace-nowrap w-[160px] text-gray-800">{user?.displayName}</p>
                     <p className="text-sm overflow-hidden text-ellipsis whitespace-nowrap w-[160px] text-gray-500">{user?.email}</p>
                 </div>
 
