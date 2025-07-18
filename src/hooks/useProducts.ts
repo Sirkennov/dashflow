@@ -5,7 +5,7 @@ import {
   query, 
   orderBy, 
   type DocumentData,
-  FieldValue // Importa FieldValue para createdAt
+  Timestamp
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -17,7 +17,7 @@ export interface ProductData extends DocumentData {
     price: number;
     stock: number;
     category: string;
-    createdAt: FieldValue; // Usaremos FieldValue para la creación de Timestamp
+    createdAt: Timestamp;
 }
 
 interface UseProductsResult {
@@ -43,14 +43,13 @@ export const useProducts = (): UseProductsResult => {
             const productsData: ProductData[] = [];
             snapshot.forEach((doc) => {
                 const data = doc.data(); 
-                // Asegúrate de que todos los campos esperados estén presentes y sean del tipo correcto
                 if (
                     data.name && 
-                    data.description !== undefined && // description podría ser una cadena vacía
+                    data.description !== undefined && 
                     typeof data.price === 'number' && 
                     typeof data.stock === 'number' && 
                     data.category &&
-                    data.createdAt
+                    data.createdAt instanceof Timestamp
                 ) {
                     productsData.push({
                         id: doc.id,
@@ -59,10 +58,10 @@ export const useProducts = (): UseProductsResult => {
                         price: data.price,
                         stock: data.stock,
                         category: data.category,
-                        createdAt: data.createdAt, // Esto será un Timestamp de Firestore
+                        createdAt: data.createdAt, 
                     });
                 } else {
-                    console.warn("Documento de producto incompleto o mal formado:", doc.id, data);
+                    console.warn("Documento de producto incompleto o mal formado o 'createdAt' no es Timestamp:", doc.id, data);
                 }
             });
             setProducts(productsData);
