@@ -1,12 +1,11 @@
-import { useState, useMemo } from 'react'; // Importa useMemo para optimización
+import { useState, useMemo } from 'react';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import { collection, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useUsers, type UserData } from '../hooks/useUsers';
 import { UserFormModal } from './UserFormModal';
 import { Pagination } from '../components/Pagination';
-import { ContentHeader } from '../components/ContentHeader'; // Tu ContentHeader
-// No necesitas importar SearchInput directamente aquí, ya que ContentHeader lo hace
+import { ContentHeader } from '../components/ContentHeader';
 
 export const UsersPage: React.FC = () => {
     const { users, loading, error } = useUsers();

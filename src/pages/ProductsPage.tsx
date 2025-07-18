@@ -1,20 +1,15 @@
 import { useState, useMemo } from 'react';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
-// Importamos funciones de Firestore: collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp
 import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, Timestamp } from 'firebase/firestore';
-import { db } from '../firebase'; // Importa la instancia de Firestore
-// Importa el hook y la interfaz ProductData, así como Timestamp para el tipado
+import { db } from '../firebase';
 import { useProducts, type ProductData } from '../hooks/useProducts';
-import { ProductFormModal } from './ProductFormModal'; // Importa el modal del formulario de producto
-import { Pagination } from '../components/Pagination'; // Componente de paginación
-import { ContentHeader } from '../components/ContentHeader'; // Encabezado de contenido con botón y búsqueda
+import { ProductFormModal } from './ProductFormModal';
+import { Pagination } from '../components/Pagination';
+import { ContentHeader } from '../components/ContentHeader';
 
 export const ProductsPage: React.FC = () => {
-    // Utiliza el hook useProducts para obtener los datos de productos y sus estados
     const { products, loading, error } = useProducts();
-    // Estado para controlar la visibilidad del modal de formulario
     const [showProductFormModal, setShowProductFormModal] = useState(false);
-    // Estado para almacenar el producto seleccionado para edición
     const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(null);
 
     // Estado para la paginación
