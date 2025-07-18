@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
-import { Header } from '../components/Header';
-import { MainContent } from '../components/MainContent';
+import { MainHeader } from '../components/MainHeader';
 import { DashboardPage } from './DashboardPage';
 import { UsersPage } from './UsersPage';
 import { ProductsPage } from './ProductsPage';
@@ -31,11 +30,11 @@ export const HomePage: React.FC = () => {
         <div className="flex h-screen bg-white gap-3 p-4">
             {/* Pasa activeContent al Sidebar */}
             <Sidebar onNavLinkClick={handleNavLinkClick} activePath={`/${activeContent}`} />
-            <div className="flex-1 flex flex-col">
-                <Header />
-                <MainContent>
+            <div className="flex-1 flex flex-col flex-grow gap-3">
+                <MainHeader />
+                <div className="flex-grow overflow-hidden bg-gray-200 shadow-md shadow-gray-300 rounded-lg">
                     {renderActivePage()}
-                </MainContent>
+                </div>
             </div>
         </div>
     );
