@@ -167,7 +167,7 @@ export const ProductsPage: React.FC = () => {
                                 <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px] min-w-[100px]">
                                     Categoría
                                 </th>
-                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px] min-w-[100px]">
+                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[80px] min-w-[80px]">
                                     Creado
                                 </th>
                                 <th className="pr-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px] min-w-[90px]">
