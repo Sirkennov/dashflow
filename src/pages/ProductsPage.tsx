@@ -1,116 +1,122 @@
 import { useState, useMemo } from 'react';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
-import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase';
-import { useProducts, type ProductData } from '../hooks/useProducts'; // Importa useProducts y ProductData
-import { ProductFormModal } from './ProductFormModal'; // Importa el nuevo modal
-import { Pagination } from '../components/Pagination';
-import { ContentHeader } from '../components/ContentHeader';
+// Importamos funciones de Firestore: collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp
+import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { db } from '../firebase'; // Importa la instancia de Firestore
+// Importa el hook y la interfaz ProductData, así como Timestamp para el tipado
+import { useProducts, type ProductData } from '../hooks/useProducts';
+import { ProductFormModal } from './ProductFormModal'; // Importa el modal del formulario de producto
+import { Pagination } from '../components/Pagination'; // Componente de paginación
+import { ContentHeader } from '../components/ContentHeader'; // Encabezado de contenido con botón y búsqueda
 
 export const ProductsPage: React.FC = () => {
-    const { products, loading, error } = useProducts(); // Usa el hook de productos
+    // Utiliza el hook useProducts para obtener los datos de productos y sus estados
+    const { products, loading, error } = useProducts();
+    // Estado para controlar la visibilidad del modal de formulario
     const [showProductFormModal, setShowProductFormModal] = useState(false);
+    // Estado para almacenar el producto seleccionado para edición
     const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(null);
 
     // Estado para la paginación
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(15); // Define cuántos elementos por página
+    const [itemsPerPage] = useState(15); // Cantidad de elementos por página
 
-    // Estado para el término de búsqueda
+    // --- Estado para el término de búsqueda ---
     const [searchTerm, setSearchTerm] = useState('');
 
-    // --- LÓGICA DE FILTRADO Y PAGINACIÓN ---
+    // --- LÓGICA DE FILTRADO (memorizada para optimización) ---
     const filteredProducts = useMemo(() => {
-        let filtered = products;
-
-        if (searchTerm) {
-            const lowerCaseSearchTerm = searchTerm.toLowerCase();
-            filtered = products.filter(product => {
-                return (
-                    product.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-                    product.description.toLowerCase().includes(lowerCaseSearchTerm) ||
-                    product.category.toLowerCase().includes(lowerCaseSearchTerm) ||
-                    String(product.price).includes(lowerCaseSearchTerm) ||
-                    String(product.stock).includes(lowerCaseSearchTerm)
-                );
-            });
+        if (!searchTerm) { // Si el término de búsqueda está vacío, devuelve todos los productos
+            return products;
         }
-        return filtered;
-    }, [products, searchTerm]);
 
-    const paginatedProducts = useMemo(() => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        return filteredProducts.slice(startIndex, endIndex);
-    }, [filteredProducts, currentPage, itemsPerPage]);
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+        return products.filter(product => {
+            // Filtra por nombre, descripción, precio, stock o categoría
+            return (
+                product.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+                product.description.toLowerCase().includes(lowerCaseSearchTerm) ||
+                product.price.toString().includes(lowerCaseSearchTerm) || // Convertir a string para buscar
+                product.stock.toString().includes(lowerCaseSearchTerm) || // Convertir a string para buscar
+                product.category.toLowerCase().includes(lowerCaseSearchTerm)
+            );
+        });
+    }, [products, searchTerm]); // Recalcula solo cuando 'products' o 'searchTerm' cambian
 
-    // --- MANEJADORES DEL MODAL ---
-    const handleAddProduct = () => {
-        setSelectedProduct(null); // Asegura que el modal esté en modo "añadir"
+    // Calcular productos para la página actual
+    const indexOfLastProduct = currentPage * itemsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+    // --- Manejo de cambio de página ---
+    const handlePageChange = (pageNumber: number) => {
+        setCurrentPage(pageNumber);
+    };
+
+    // Funciones para abrir/cerrar el modal de formulario
+    const handleAddProductClick = () => {
+        setSelectedProduct(null); // Asegura que no haya producto seleccionado (modo añadir)
         setShowProductFormModal(true);
     };
 
-    const handleEditProduct = (product: ProductData) => {
-        setSelectedProduct(product); // Pasa el producto para editar
+    const handleEditProductClick = (product: ProductData) => {
+        setSelectedProduct(product); // Establece el producto seleccionado (modo editar)
         setShowProductFormModal(true);
     };
 
     const handleCloseProductFormModal = () => {
         setShowProductFormModal(false);
-        setSelectedProduct(null); // Limpia el producto seleccionado al cerrar
+        setSelectedProduct(null); // Limpiar producto seleccionado al cerrar
     };
 
-    // --- OPERACIONES CRUD DE FIRESTORE ---
+    // --- LÓGICA CRUD CON FIREBASE ---
+
+    // Función para AÑADIR o EDITAR un producto
     const handleSaveProduct = async (productData: Omit<ProductData, 'id' | 'createdAt'> | ProductData) => {
         try {
-            if ('id' in productData && productData.id) {
-                // Es una edición
-                const { id, createdAt, ...dataToUpdate } = productData;
-                const productRef = doc(db, 'products', id);
-                await updateDoc(productRef, dataToUpdate);
+            if (selectedProduct && (productData as ProductData).id) {
+                // Modo EDICIÓN: El producto ya existe, actualizamos
+                // Extraemos 'id' y 'createdAt' ya que no queremos que se actualicen
+                const { id, createdAt, ...dataToUpdate } = productData as ProductData;
+                const productRef = doc(db, 'products', id); // Referencia al documento a actualizar
+                await updateDoc(productRef, dataToUpdate); // Actualiza los datos del documento
                 console.log("Producto actualizado con ID:", id);
             } else {
-                // Es un nuevo producto
-                // Añadimos createdAt con serverTimestamp() solo al crear
-                const productWithTimestamp = {
+                // Modo AÑADIR: Nuevo producto, añadimos un nuevo documento
+                // Usamos serverTimestamp() para añadir la fecha de creación en el servidor de Firestore
+                await addDoc(collection(db, 'products'), {
                     ...productData,
-                    createdAt: serverTimestamp(),
-                };
-                await addDoc(collection(db, 'products'), productWithTimestamp);
-                console.log("Nuevo producto añadido");
+                    createdAt: serverTimestamp()
+                });
+                console.log("Nuevo producto añadido.");
             }
-        } catch (e) {
-            console.error("Error al guardar el producto:", e);
-            throw e; // Lanza el error para que el modal pueda manejarlo
+        } catch (error) {
+            console.error("Error al guardar el producto:", error);
+            throw error; // Re-lanza el error para que el formulario lo maneje si es necesario
         }
     };
 
+    // Función para ELIMINAR un producto
     const handleDeleteProduct = async (productId: string) => {
         if (window.confirm("¿Estás seguro de que quieres eliminar este producto?")) {
             try {
-                await deleteDoc(doc(db, 'products', productId));
+                await deleteDoc(doc(db, 'products', productId)); // Elimina el documento de Firestore
                 console.log("Producto eliminado con ID:", productId);
-            } catch (e) {
-                console.error("Error al eliminar el producto:", e);
-                alert("Hubo un error al eliminar el producto.");
+                // Ajusta la paginación si se elimina el último elemento de la página actual
+                if (currentProducts.length === 1 && currentPage > 1 && products.length - 1 <= indexOfFirstProduct) {
+                    setCurrentPage(prev => prev - 1);
+                }
+            } catch (error) {
+                console.error("Error al eliminar el producto:", error);
+                alert("Hubo un error al eliminar el producto."); // Muestra un mensaje de error al usuario
             }
         }
     };
 
-    // --- MANEJADORES DE PAGINACIÓN ---
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
-
-    // --- MANEJADOR DE BÚSQUEDA ---
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
-        setCurrentPage(1); // Resetear a la primera página al buscar
-    };
-
+    // --- Manejo de estados de carga/error ---
     if (loading) {
         return (
-            <div className="flex-1 p-6 flex justify-center items-center">
+            <div className="flex items-center justify-center min-h-full">
                 <p className="text-gray-700">Cargando productos...</p>
             </div>
         );
@@ -118,78 +124,100 @@ export const ProductsPage: React.FC = () => {
 
     if (error) {
         return (
-            <div className="flex-1 p-6 flex justify-center items-center">
+            <div className="flex items-center justify-center min-h-screen">
                 <p className="text-red-500">Error: {error}</p>
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col h-full bg-gray-200 rounded-lg shadow-md overflow-hidden">
-            <ContentHeader
-                title="Productos"
-                onClick={handleAddProduct}
-                searchValue={searchTerm}
-                onSearchChange={handleSearchChange}
-            />
+        <div className="h-full flex flex-col overflow-hidden">
+            <div className="flex flex-col flex-grow overflow-hidden">
+                {/* Header */}
+                <ContentHeader
+                    title="Productos" // Título para Productos
+                    onClick={handleAddProductClick}
+                    searchValue={searchTerm}
+                    onSearchChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setCurrentPage(1); // Reinicia la paginación al buscar
+                    }}
+                />
 
-            <div className="flex-1 overflow-y-auto px-6 py-4">
-                <div className="overflow-x-auto rounded-lg shadow">
-                    <table className="min-w-full leading-normal">
-                        <thead>
-                            <tr className="bg-gray-800 text-white uppercase text-sm font-semibold">
-                                <th className="px-5 py-3 border-b-2 border-gray-700 text-left">Nombre</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-700 text-left">Descripción</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-700 text-left">Precio</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-700 text-left">Stock</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-700 text-left">Categoría</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-700 text-left">Creación</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-700 text-center">Acciones</th>
+                {/* Tabla de productos */}
+                <div className="flex-grow overflow-y-auto overflow-x-auto">
+                    <table className="w-full table-fixed divide-y divide-gray-200">
+                        <thead className="bg-gray-50 sticky top-0 rounded-b-lg">
+                            <tr>
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[50px] min-w-[50px]">
+                                    ID
+                                </th>
+                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px] min-w-[100px]">
+                                    Nombre
+                                </th>
+                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px] min-w-[100px]">
+                                    Descripción
+                                </th>
+                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px] min-w-[100px]">
+                                    Precio
+                                </th>
+                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px] min-w-[100px]">
+                                    Stock
+                                </th>
+                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px] min-w-[100px]">
+                                    Categoría
+                                </th>
+                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px] min-w-[100px]">
+                                    Creado
+                                </th>
+                                <th className="pr-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px] min-w-[90px]">
+                                    Acciones
+                                </th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {paginatedProducts.length === 0 ? (
-                                <tr>
-                                    <td colSpan={7} className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                                        No se encontraron productos.
-                                    </td>
-                                </tr>
-                            ) : (
-                                paginatedProducts.map((product) => (
-                                    <tr key={product.id} className="hover:bg-gray-100">
-                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                            <p className="text-gray-900 whitespace-no-wrap">{product.name}</p>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {currentProducts.map((product, index) => {
+                                const sequentialId = (currentPage - 1) * itemsPerPage + index + 1;
+                                const creationDate = product.createdAt instanceof Timestamp
+                                    ? product.createdAt.toDate().toLocaleDateString('es-ES', {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })
+                                    : 'N/A'; // Muestra 'N/A' si createdAt no es un Timestamp válido
+                                return (
+                                    <tr key={product.id} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4 text-center text-sm text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+                                            {sequentialId}
                                         </td>
-                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                            <p className="text-gray-900 whitespace-no-wrap max-w-xs overflow-hidden text-ellipsis">
-                                                {product.description || 'N/A'}
-                                            </p>
+                                        <td className="pr-6 py-4 text-sm text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+                                            {product.name}
                                         </td>
-                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                            <p className="text-gray-900 whitespace-no-wrap">${product.price.toFixed(2)}</p>
+                                        <td className="pr-6 py-4 text-sm text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+                                            {product.description}
                                         </td>
-                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                            <p className="text-gray-900 whitespace-no-wrap">{product.stock}</p>
+                                        <td className="pr-6 py-4 text-sm text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+                                            {product.price}
                                         </td>
-                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                            <p className="text-gray-900 whitespace-no-wrap">{product.category}</p>
+                                        <td className="pr-6 py-4 text-sm text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+                                            {product.stock}
                                         </td>
-                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                            <p className="text-gray-900 whitespace-no-wrap">
-                                                {/* Asegúrate de que createdAt sea un objeto Timestamp */}
-                                                {'toDate' in product.createdAt ? (product.createdAt as any).toDate().toLocaleDateString() : 'N/A'}
-                                            </p>
+                                        <td className="pr-6 py-4 text-sm text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+                                            {product.category}
                                         </td>
-                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                                            <div className="flex justify-center items-center space-x-3">
+                                        <td className="pr-6 py-4 text-sm text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+                                            {creationDate}
+                                        </td>
+                                        <td className="pr-6 py-4 text-sm font-medium">
+                                            <div className="flex items-center justify-center space-x-3">
                                                 <button
-                                                    className="text-blue-600 hover:text-blue-900 transition-colors"
-                                                    onClick={() => handleEditProduct(product)}
+                                                    className="text-indigo-600 hover:text-indigo-900 transition-colors cursor-pointer"
+                                                    onClick={() => handleEditProductClick(product)}
                                                 >
                                                     <FiEdit className="w-5 h-5" />
                                                 </button>
                                                 <button
-                                                    className="text-red-600 hover:text-red-900 transition-colors"
+                                                    className="text-red-600 hover:text-red-900 transition-colors cursor-pointer"
                                                     onClick={() => handleDeleteProduct(product.id)}
                                                 >
                                                     <FiTrash2 className="w-5 h-5" />
@@ -197,20 +225,21 @@ export const ProductsPage: React.FC = () => {
                                             </div>
                                         </td>
                                     </tr>
-                                )
-                            ))}
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
+                {/* Componente de paginación */}
                 <Pagination
-                    className='flex-shrink-0 border-t border-gray-200 mt-4' // Añadí mt-4 para separación
-                    totalItems={filteredProducts.length} // totalItems es el número de elementos filtrados
+                    className='flex-shrink-0 border-t border-gray-200'
+                    totalItems={filteredProducts.length}
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={handlePageChange}
                 />
             </div>
-
+            {/* Renderiza el modal del formulario si showProductFormModal es true */}
             {showProductFormModal && (
                 <ProductFormModal
                     onClose={handleCloseProductFormModal}
