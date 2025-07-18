@@ -132,25 +132,25 @@ export const UsersPage: React.FC = () => {
                     <table className="w-full table-fixed divide-y divide-gray-200">
                         <thead className="bg-gray-50 sticky top-0 rounded-b-lg">
                             <tr>
-                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px] min-w-[90px]">
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[50px] min-w-[50px]">
                                     ID
                                 </th>
-                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[150px] min-w-[100px]">
+                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[130px] min-w-[100px]">
                                     Nombre
                                 </th>
-                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[150px] min-w-[100px]">
+                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[130px] min-w-[100px]">
                                     Apellido
                                 </th>
-                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px] min-w-[100px]">
+                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px] min-w-[100px]">
                                     Salario
                                 </th>
-                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px] min-w-[100px]">
+                                <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[140px] min-w-[100px]">
                                     País
                                 </th>
                                 <th className="pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px] min-w-[100px]">
                                     Ciudad
                                 </th>
-                                <th className="pr-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px] min-w-[90px]">
+                                <th className="pr-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[90px] min-w-[50px] ">
                                     Acciones
                                 </th>
                             </tr>

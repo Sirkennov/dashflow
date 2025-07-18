@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { type UserData } from '../hooks/useUsers';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
@@ -30,6 +30,23 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({ onClose, onSaveUse
     // Referencia al contenedor del modal para detectar clics fuera
     const modalContentRef = useRef<HTMLDivElement>(null);
 
+    // Determina el texto del botón de envío y el título del modal
+    const title = currentUser ? "Editar Usuario" : "Nuevo Usuario";
+    const submitButtonText = currentUser ? 'Guardar Cambios' : 'Añadir Usuario';
+
+    // Efecto para detectar clics fuera del modal y cerrarlo
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (modalContentRef.current && !modalContentRef.current.contains(event.target as Node)) {
+                onClose();
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [onClose]); // Se vuelve a ejecutar si onClose cambia (aunque en este caso es estable)
 
     // Expresiones regulares para validación:
     // ^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$
@@ -130,11 +147,11 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({ onClose, onSaveUse
                 country: country.trim(),
                 city: city.trim(),
             };
-
+            // Modo Edición:
             if (currentUser && currentUser.id) {
                 (userDataToSave as UserData).id = currentUser.id;
             }
-
+            // Modo Añadir:
             await onSaveUser(userDataToSave);
             onClose(); // Cerrar el modal solo si el guardado fue exitoso
         } catch (error) {
@@ -145,21 +162,8 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({ onClose, onSaveUse
         }
     };
 
-    // --- Función para cerrar el modal al hacer click fuera de este ---
-    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (modalContentRef.current && !modalContentRef.current.contains(e.target as Node)) {
-            onClose();
-        }
-    }
-
-    const title = currentUser ? "Editar Usuario" : "Nuevo Usuario";
-    const submitButtonText = currentUser ? 'Guardar Cambios' : 'Añadir Usuario';
-
     return (
-        <div
-            className="fixed inset-0 bg-black/50 flex justify-center overflow-auto items-center z-50"
-            onClick={handleOverlayClick}
-        >
+        <div className="fixed inset-0 bg-black/50 flex justify-center overflow-auto items-center z-50">
             <div className="bg-white p-6 rounded-lg w-full max-w-md" ref={modalContentRef}>
                 <h3 className="text-xl font-bold mb-4 text-gray-800">{title}</h3>
                 <form onSubmit={handleSubmit}>
