@@ -6,7 +6,7 @@ import { Button } from '../components/Button';
 interface ProductFormModalProps {
     onClose: () => void;
     onSaveProduct: (productData: Omit<ProductData, 'id' | 'createdAt'> | ProductData) => Promise<void>;
-    currentProduct?: ProductData | null; // El producto actual si estamos editando
+    currentProduct?: ProductData | null;
 }
 
 export const ProductFormModal: React.FC<ProductFormModalProps> = ({ onClose, onSaveProduct, currentProduct }) => {
@@ -15,14 +15,14 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ onClose, onS
     const [description, setDescription] = useState(currentProduct?.description || '');
     const [price, setPrice] = useState(currentProduct?.price ? String(currentProduct.price) : '');
     const [stock, setStock] = useState(currentProduct?.stock ? String(currentProduct.stock) : '');
-    const [category, setCategory] = useState(currentProduct?.category || ''); // Estado para la categoría
+    const [category, setCategory] = useState(currentProduct?.category || '');
 
     // Estados para los mensajes de error de validación
     const [nameError, setNameError] = useState<string | null>(null);
     const [descriptionError, setDescriptionError] = useState<string | null>(null);
     const [priceError, setPriceError] = useState<string | null>(null);
     const [stockError, setStockError] = useState<string | null>(null);
-    const [categoryError, setCategoryError] = useState<string | null>(null); // Estado de error para categoría
+    const [categoryError, setCategoryError] = useState<string | null>(null);
 
     // Estado para indicar si el formulario se está enviando (para deshabilitar el botón)
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,7 +69,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ onClose, onS
         }
 
         // Validar Precio
-        const parsedPrice = Number(price); // Convertir a número para validación
+        const parsedPrice = Number(price);
         if (price.trim() === '') {
             setPriceError('El precio no puede estar vacío.');
             isValid = false;
@@ -84,11 +84,11 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ onClose, onS
         }
 
         // Validar Stock
-        const parsedStock = Number(stock); // Convertir a número para validación
+        const parsedStock = Number(stock);
         if (stock.trim() === '') {
             setStockError('El stock no puede estar vacío.');
             isValid = false;
-        } else if (isNaN(parsedStock) || !Number.isInteger(parsedStock)) { // Debe ser un número entero
+        } else if (isNaN(parsedStock) || !Number.isInteger(parsedStock)) {
             setStockError('El stock debe ser un número entero.');
             isValid = false;
         } else if (parsedStock < 0) {
@@ -118,9 +118,8 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ onClose, onS
             return;
         }
 
-        setIsSubmitting(true); // Indica que el envío está en curso
+        setIsSubmitting(true);
         try {
-            // Crea el objeto de datos del producto sin 'id' ni 'createdAt' inicialmente
             const productDataToSave: Omit<ProductData, 'id' | 'createdAt'> = {
                 name: name.trim(),
                 description: description.trim(),

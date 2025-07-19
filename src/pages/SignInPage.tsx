@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { useNavigate } from 'react-router-dom';
-import { useRegister } from '../hooks/useRegister'; // Asegúrate de que este hook ya retorna 'loading'
+import { useRegister } from '../hooks/useRegister';
 
 export const SignInPage: React.FC = () => {
     const [email, setEmail] = useState('');

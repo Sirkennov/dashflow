@@ -4,11 +4,11 @@ import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 interface CustomUser extends User {
-    displayName: string | null; // Añade la propiedad displayName
+    displayName: string | null;
 }
 
 interface AuthState {
-    user: CustomUser | null; // El user puede ser CustomUser o User
+    user: CustomUser | null;
     loading: boolean;
 }
 
@@ -36,7 +36,7 @@ export const useAuth = (): AuthState => {
                         // Si por alguna razón no encuentra el documento en Firestore
                         const customUser: CustomUser = {
                             ...currentUser,
-                            displayName: null, // O un valor por defecto
+                            displayName: null,
                         };
                         setUser(customUser);
                         console.warn("No se encontró el documento de usuario en Firestore para UID:", currentUser.uid);

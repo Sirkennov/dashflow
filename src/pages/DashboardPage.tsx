@@ -180,7 +180,7 @@ export const DashboardPage = () => {
                     {/* Widget: Productos con Bajo Stock */}
                     <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
                         <h3 className="text-xl font-semibold text-gray-800 mb-5 flex items-center">
-                            <FaExclamationTriangle className="text-orange-500 mr-3 text-2xl" /> Productos con Bajo Stock {/* Icono un poco más grande */}
+                            <FaExclamationTriangle className="text-orange-500 mr-3 text-2xl" /> Productos con Bajo Stock
                         </h3>
                         {lowStockProducts.length > 0 ? (
                             <ul className="space-y-4">
@@ -191,7 +191,7 @@ export const DashboardPage = () => {
                                         border-orange-200 shadow-sm transition-all
                                         duration-200 hover:shadow-md
                                     ">
-                                        <div className="flex flex-col flex-grow overflow-hidden mr-2"> {/* flex-grow y overflow-hidden para el texto */}
+                                        <div className="flex flex-col flex-grow overflow-hidden mr-2">
                                             <span className="
                                                 font-bold text-lg
                                                 text-orange-800 whitespace-nowrap overflow-hidden text-ellipsis
@@ -223,7 +223,7 @@ export const DashboardPage = () => {
                     {/* Widget: Productos con Stock Alto */}
                     <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
                         <h3 className="text-xl font-semibold text-gray-800 mb-5 flex items-center">
-                            <FaBoxes className="text-blue-500 mr-3 text-2xl" /> Productos con Stock Alto {/* Icono un poco más grande */}
+                            <FaBoxes className="text-blue-500 mr-3 text-2xl" /> Productos con Stock Alto
                         </h3>
                         {highStockProducts.length > 0 ? (
                             <ul className="space-y-4">
@@ -234,7 +234,7 @@ export const DashboardPage = () => {
                                         border-blue-200 shadow-sm transition-all
                                         duration-200 hover:shadow-md
                                     ">
-                                        <div className="flex flex-col flex-grow overflow-hidden mr-2"> {/* flex-grow y overflow-hidden para el texto */}
+                                        <div className="flex flex-col flex-grow overflow-hidden mr-2">
                                             <span className="
                                                 font-bold text-lg
                                                 text-blue-800 whitespace-nowrap overflow-hidden text-ellipsis
@@ -266,7 +266,7 @@ export const DashboardPage = () => {
                     {/* Widget: Últimos Usuarios Registrados */}
                     <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 lg:col-span-1">
                         <h3 className="text-xl font-semibold text-gray-800 mb-5 flex items-center">
-                            <FaUserPlus className="text-purple-500 mr-3 text-2xl" /> Últimos Usuarios {/* Icono un poco más grande */}
+                            <FaUserPlus className="text-purple-500 mr-3 text-2xl" /> Últimos Usuarios
                         </h3>
                         {latestUsers.length > 0 ? (
                             <ul className="space-y-4">
@@ -276,13 +276,12 @@ export const DashboardPage = () => {
                                         rounded-lg border border-gray-200 shadow-sm 
                                         transition-all duration-200 hover:shadow-md
                                     ">
-                                        {/* Avatar del Usuario - Ahora w-10 h-10 para un tamaño que se ajusta mejor al diseño general y al texto */}
                                         <img
                                             src={user.avatarUrl || "src/assets/images/fotoperfil.webp"}
                                             alt={"fotoejemplo"}
                                             className="w-10 h-10 rounded-full object-cover mr-4 ring-2 ring-purple-300 ring-offset-2 flex-shrink-0"
                                         />
-                                        <div className="flex-grow overflow-hidden"> {/* flex-grow y overflow-hidden para el texto del usuario */}
+                                        <div className="flex-grow overflow-hidden">
                                             <p className="
                                                 font-bold text-lg text-gray-800 whitespace-nowrap 
                                                 overflow-hidden text-ellipsis

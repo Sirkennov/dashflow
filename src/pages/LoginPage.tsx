@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { useNavigate } from 'react-router-dom';
-import { useLogin } from '../hooks/useLogin'; // Importa tu hook de login
+import { useLogin } from '../hooks/useLogin';
 
 export const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');

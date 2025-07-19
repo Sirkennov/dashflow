@@ -31,8 +31,8 @@ export const ProductsPage: React.FC = () => {
             return (
                 product.name.toLowerCase().includes(lowerCaseSearchTerm) ||
                 product.description.toLowerCase().includes(lowerCaseSearchTerm) ||
-                product.price.toString().includes(lowerCaseSearchTerm) || // Convertir a string para buscar
-                product.stock.toString().includes(lowerCaseSearchTerm) || // Convertir a string para buscar
+                product.price.toString().includes(lowerCaseSearchTerm) ||
+                product.stock.toString().includes(lowerCaseSearchTerm) ||
                 product.category.toLowerCase().includes(lowerCaseSearchTerm)
             );
         });
@@ -130,12 +130,12 @@ export const ProductsPage: React.FC = () => {
             <div className="flex flex-col flex-grow overflow-hidden">
                 {/* Header */}
                 <ContentHeader
-                    title="Productos" // Título para Productos
+                    title="Productos"
                     onClick={handleAddProductClick}
                     searchValue={searchTerm}
                     onSearchChange={(e) => {
                         setSearchTerm(e.target.value);
-                        setCurrentPage(1); // Reinicia la paginación al buscar
+                        setCurrentPage(1);
                     }}
                 />
 

@@ -43,7 +43,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             <div className="px-6 py-3 bg-gray-50 flex items-center justify-between rounded-b-lg border-gray-200">
                 <div className="flex items-center space-x-2 text-sm text-gray-700">
                     <span>Filas visibles: </span><span className="font-semibold">{itemsPerPage}</span>
-                    {/* Implementación del selector de filas visibles */}
+                    {/* Implementación a futuro del selector de filas visibles */}
                     {/* <button className="ml-2 px-2 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-xs">
                         <span className="transform rotate-90 inline-block">˅</span>
                     </button> */}

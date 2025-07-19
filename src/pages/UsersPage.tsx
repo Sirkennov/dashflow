@@ -16,7 +16,7 @@ export const UsersPage: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(15);
 
-    // --- Estado para el término de bpusqueda ---
+    // --- Estado para el término de búsqueda ---
     const [searchTerm, setSearchTerm] = useState('');
 
     // --- LÓGICA DE FILTRADO ---
