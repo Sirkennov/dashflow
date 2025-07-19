@@ -4,7 +4,7 @@ Este proyecto está bajo la [Licencia MIT](LICENSE).
 
 # 🚀 Dashflow: Tu Panel de Control Administrativo
 
-Un panel de control administrativo **moderno y responsivo** diseñado para gestionar usuarios, productos e inventario de manera eficiente. Dashflow te proporciona una visión clara de tus métricas clave y te ayuda a mantener el control de tus operaciones.
+Un panel de control administrativo **moderno y responsivo** diseñado para gestionar usuarios, productos e inventario de manera eficiente.
 
 ## ✨ Características Destacadas
 
