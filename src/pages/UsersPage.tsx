@@ -76,6 +76,7 @@ export const UsersPage: React.FC = () => {
                 // Modo AÑADIR: Nuevo usuario, añadimos un nuevo documento
                 await addDoc(collection(db, 'users'), userData);
             }
+            setShowUserFormModal(false);
         } catch (error) {
             throw error; // Re-lanza el error para que el formulario lo maneje
         }
