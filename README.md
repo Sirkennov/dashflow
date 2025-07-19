@@ -52,7 +52,7 @@ Asegúrate de tener instalado:
 1.  **Clona el repositorio:**
 
     ```bash
-    git clone [https://github.com/Sirkennov/dashflow.git]
+    git clone https://github.com/Sirkennov/dashflow.git
     ```
 
 2.  **Navega al directorio del proyecto:**
